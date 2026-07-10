@@ -1,55 +1,45 @@
-import self as self
-from matplotlib.backends.backend_pdf import PdfPages
-import openpyxl as xl
-from reportlab.platypus import BaseDocTemplate
-from reportlab.rl_settings import defaultPageSize
+"""
+BloodTest.py
 
-from plot_data import *
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import mm
-from PIL import Image
+Main application entry point.
+"""
 
-import test
+import matplotlib.pyplot as plt
 
-# loading excel file
-wb = xl.load_workbook('Test.xlsx')
-sheet = wb['Number']
+from excel_reader import read_excel
+from pdf_builder import PdfReport
+from plot_data import create_plot
 
-max_row = sheet.max_row
 
-# finding maximum column number
-max_col = 1
-while sheet.cell(1, max_col).value is not None:
-    max_col += 1
-else:
-    max_col -= 1
+def main():
+    """
+    Generate the blood test report.
+    """
 
-# creating an empty list
-data_list = [None] * max_row
-for i in range(max_row):
-    data_list[i] = [None] * max_col
+    print("Reading Excel workbook...")
 
-# transfer data from sheet to the 2-D list
-for row_count in range(max_row):
-    for col_count in range(max_col):
-        data_list[row_count][col_count] = sheet.cell(row_count + 1, col_count + 1).value
+    parameters = read_excel()
 
-for i in range(max_row):
-    print(data_list[i][:])
+    print(f"Found {len(parameters)} parameters.")
 
-# create a PdfPages object
-c = canvas.Canvas("Out2.pdf")
-c.drawString(100, 100, "Hello World")
+    report = PdfReport()
 
-# plot all parameters
-for col_number in range(5, 6, 3):
-    fig = plot_data_col(data_list, col_number)
-    # save the current figure
-    fig.savefig("temp.png")
-    test.build_pdf("Out3.pdf")
-    img = Image.open("temp.png")
-    print(img.width, img.height)
-    c.drawImage("temp.png", 0 * mm, 0 * mm, 100 * mm, 100 * img.height / img.width * mm)
+    for parameter in parameters:
 
-c.showPage()
-c.save()
+        print(f"Generating plot: {parameter.name}")
+
+        fig = create_plot(parameter)
+
+        report.add_page(fig, parameter)
+
+        # Free matplotlib resources
+        plt.close(fig)
+
+    report.save()
+
+    print("Done.")
+    print("Report saved successfully.")
+
+
+if __name__ == "__main__":
+    main()
