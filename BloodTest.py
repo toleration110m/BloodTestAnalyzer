@@ -1,44 +1,52 @@
 """
 BloodTest.py
 
-Main application entry point.
+Main entry point for the Blood Test Analyzer.
 """
 
-import matplotlib.pyplot as plt
-
+from config import INPUT_FILE, OUTPUT_FILE
 from excel_reader import read_excel
 from pdf_builder import PdfReport
-from plot_data import create_plot
 
 
-def main():
+def main() -> None:
     """
-    Generate the blood test report.
+    Generate the blood test PDF report.
     """
 
-    print("Reading Excel workbook...")
+    if not INPUT_FILE.exists():
+        raise FileNotFoundError(
+            f"Input Excel file not found:\n{INPUT_FILE}"
+        )
 
-    parameters = read_excel()
+    print("Reading Excel file...")
 
-    print(f"Found {len(parameters)} parameters.")
+    parameters = read_excel(INPUT_FILE)
 
-    report = PdfReport()
+    if not parameters:
+        raise RuntimeError(
+            "No blood test parameters found."
+        )
 
-    for parameter in parameters:
+    print(f"{len(parameters)} parameters loaded.\n")
 
-        print(f"Generating plot: {parameter.name}")
+    report = PdfReport(OUTPUT_FILE)
 
-        fig = create_plot(parameter)
+    total = len(parameters)
 
-        report.add_page(fig, parameter)
+    for index, parameter in enumerate(parameters, start=1):
 
-        # Free matplotlib resources
-        plt.close(fig)
+        print(
+            f"[{index:02d}/{total:02d}] "
+            f"Generating {parameter.name}"
+        )
+
+        report.add_page(parameter)
 
     report.save()
 
-    print("Done.")
-    print("Report saved successfully.")
+    print()
+    print(f"Report saved to:\n{OUTPUT_FILE}")
 
 
 if __name__ == "__main__":

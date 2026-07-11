@@ -8,7 +8,12 @@ from pathlib import Path
 
 import openpyxl
 
-from config import INPUT_FILE, SHEET_NAME
+from config import (
+    INPUT_FILE,
+    SHEET_NAME,
+    FIRST_PARAMETER_COLUMN,
+    PARAMETER_COLUMN_STEP,
+)
 from models import ParameterData
 
 
@@ -53,7 +58,11 @@ def read_excel(file_path: Path = INPUT_FILE) -> list[ParameterData]:
     # parameter columns = 6, 9, 12, ...
     #
 
-    for parameter_col in range(6, max_col + 1, 3):
+    for parameter_col in range(
+    FIRST_PARAMETER_COLUMN,
+    max_col + 1,
+    PARAMETER_COLUMN_STEP,
+    ):
 
         parameter_name = sheet.cell(row=1, column=parameter_col).value
 

@@ -54,9 +54,6 @@ FOOTER_HEIGHT = 8 * mm
 # Plot Area
 # =============================================================================
 
-FIGURE_WIDTH = 4.0       # inches (landscape)
-FIGURE_HEIGHT = 6.2      # inches
-
 LINE_WIDTH = 2.0
 MARKER_SIZE = 5
 
