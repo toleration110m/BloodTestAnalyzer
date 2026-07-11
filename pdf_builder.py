@@ -24,8 +24,6 @@ from config import (
     PAGE_HEIGHT,
     PAGE_WIDTH,
     PATIENT_NAME,
-    PLOT_HEIGHT,
-    PLOT_WIDTH,
     RIGHT_MARGIN,
     TOP_MARGIN,
 )
@@ -126,19 +124,58 @@ class PdfReport:
 
         image = ImageReader(image_buffer)
 
-        x = LEFT_MARGIN
+        img_width, img_height = image.getSize()
 
-        y = BOTTOM_MARGIN + FOOTER_HEIGHT
+        # Available plot area
+        plot_width = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN
+        plot_height = (
+            PAGE_HEIGHT
+            - TOP_MARGIN
+            - BOTTOM_MARGIN
+            - HEADER_HEIGHT
+            - FOOTER_HEIGHT
+        )
 
+        #
+        # Rotate the image by 90°.
+        # After rotation, width and height are swapped.
+        #
+        scale = min(
+            plot_width / img_height,
+            plot_height / img_width,
+        )
+
+        draw_width = img_height * scale
+        draw_height = img_width * scale
+
+        x = LEFT_MARGIN + (plot_width - draw_width) / 2
+        y = BOTTOM_MARGIN + FOOTER_HEIGHT + (plot_height - draw_height) / 2
+
+        self.canvas.saveState()
+
+        #
+        # Move origin to lower-left corner of rotated image
+        #
+        self.canvas.translate(x, y)
+
+        #
+        # Rotate counter-clockwise
+        #
+        self.canvas.rotate(90)
+
+        #
+        # Draw image
+        #
         self.canvas.drawImage(
             image,
-            x,
-            y,
-            width=PLOT_WIDTH,
-            height=PLOT_HEIGHT,
-            preserveAspectRatio=True,
+            0,
+            -draw_width,
+            width=draw_height,
+            height=draw_width,
             mask="auto",
         )
+
+        self.canvas.restoreState()
 
         image_buffer.close()
 
