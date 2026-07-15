@@ -15,7 +15,7 @@ from reportlab.lib.units import mm
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
-INPUT_FILE = PROJECT_DIR / "Test.xlsx"
+INPUT_FILE = PROJECT_DIR / "JavadShiyasi.xlsx"
 
 OUTPUT_DIR = PROJECT_DIR / "output"
 OUTPUT_FILE = OUTPUT_DIR / "BloodTestReport.pdf"
@@ -33,7 +33,7 @@ PARAMETER_COLUMN_STEP = 3
 # Patient Information
 # =============================================================================
 
-PATIENT_NAME = "John Smith"
+PATIENT_NAME = "Javad Shiyasi"
 
 # =============================================================================
 # PDF Page Settings
@@ -60,7 +60,7 @@ MARKER_SIZE = 5
 GRID_ALPHA = 0.35
 
 LINE_COLOR = "tab:blue"
-LIMIT_FILL_COLOR = "#D8F5D0"
+LIMIT_FILL_COLOR = "#6AFF40"
 
 # =============================================================================
 # Time Axis
@@ -68,7 +68,7 @@ LIMIT_FILL_COLOR = "#D8F5D0"
 
 # Number of recent years to display.
 # None = display all available history.
-PLOT_YEARS = 5
+PLOT_YEARS = 10
 
 # Major grid every year
 MAJOR_YEAR_STEP = 1
