@@ -6,19 +6,7 @@ Project configuration.
 Modify this file to change application settings.
 """
 
-from pathlib import Path
 from reportlab.lib.units import mm
-
-# =============================================================================
-# Project Paths
-# =============================================================================
-
-PROJECT_DIR = Path(__file__).resolve().parent
-
-INPUT_FILE = PROJECT_DIR / "JavadShiyasi.xlsx"
-
-OUTPUT_DIR = PROJECT_DIR / "output"
-OUTPUT_FILE = OUTPUT_DIR / "BloodTestReport.pdf"
 
 # =============================================================================
 # Excel Configuration
@@ -26,40 +14,54 @@ OUTPUT_FILE = OUTPUT_DIR / "BloodTestReport.pdf"
 
 SHEET_NAME = "Number"
 
+# Excel layout:
+#
+# A : Date
+# B : Location
+# C : Doctor
+# D : Lower Limit
+# E : Upper Limit
+# F : Parameter
+#
+# Then repeats every three columns:
+#
+# G : Lower Limit
+# H : Upper Limit
+# I : Parameter
+#
+
 FIRST_PARAMETER_COLUMN = 6
 PARAMETER_COLUMN_STEP = 3
 
 # =============================================================================
-# Patient Information
-# =============================================================================
-
-PATIENT_NAME = "Javad Shiyasi"
-
-# =============================================================================
 # PDF Page Settings
 # =============================================================================
+
+# Optimized for viewing on a typical mobile phone.
 
 PAGE_WIDTH = 90 * mm
 PAGE_HEIGHT = 170 * mm
 
 LEFT_MARGIN = 6 * mm
 RIGHT_MARGIN = 6 * mm
+
 TOP_MARGIN = 6 * mm
 BOTTOM_MARGIN = 6 * mm
 
 HEADER_HEIGHT = 12 * mm
-FOOTER_HEIGHT = 8 * mm
 
 # =============================================================================
-# Plot Area
+# Plot Style
 # =============================================================================
 
 LINE_WIDTH = 2.0
+
 MARKER_SIZE = 5
 
 GRID_ALPHA = 0.35
 
 LINE_COLOR = "tab:blue"
+
 LIMIT_FILL_COLOR = "#6AFF40"
 
 # =============================================================================
@@ -67,13 +69,19 @@ LIMIT_FILL_COLOR = "#6AFF40"
 # =============================================================================
 
 # Number of recent years to display.
-# None = display all available history.
-PLOT_YEARS = 10
+#
+# Example:
+#     5  -> last five years
+#     None -> display all available history
+
+PLOT_YEARS = 5
 
 # Major grid every year
+
 MAJOR_YEAR_STEP = 1
 
-# Minor grid every 3 months
+# Minor grid every three months
+
 MINOR_MONTH_STEP = 3
 
 # =============================================================================
@@ -81,22 +89,23 @@ MINOR_MONTH_STEP = 3
 # =============================================================================
 
 HEADER_FONT = "Helvetica-Bold"
+
 BODY_FONT = "Helvetica"
-FOOTER_FONT = "Helvetica"
 
 HEADER_FONT_SIZE = 12
+
 BODY_FONT_SIZE = 10
-FOOTER_FONT_SIZE = 9
 
 # =============================================================================
-# Output
+# PDF Metadata
 # =============================================================================
 
 PDF_TITLE = "Blood Test Report"
+
 PDF_AUTHOR = "Blood Test Analyzer"
 
 # =============================================================================
-# Miscellaneous
+# Rendering
 # =============================================================================
 
 DPI = 300

@@ -9,7 +9,6 @@ from pathlib import Path
 import openpyxl
 
 from config import (
-    INPUT_FILE,
     SHEET_NAME,
     FIRST_PARAMETER_COLUMN,
     PARAMETER_COLUMN_STEP,
@@ -17,7 +16,7 @@ from config import (
 from models import ParameterData
 
 
-def read_excel(file_path: Path = INPUT_FILE) -> list[ParameterData]:
+def read_excel(file_path: Path) -> list[ParameterData]:
     """
     Read the Excel workbook and return all blood test parameters.
 

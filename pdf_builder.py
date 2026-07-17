@@ -2,20 +2,20 @@
 pdf_builder.py
 
 Generate the PDF report.
-One blood parameter is plotted per page.
+One blood parameter per page.
 """
 
 from __future__ import annotations
 
 from io import BytesIO
-
-from PIL import Image
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+from PIL import Image
 
-from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
 from config import (
     PAGE_WIDTH,
@@ -27,10 +27,8 @@ from config import (
     HEADER_HEIGHT,
     HEADER_FONT,
     HEADER_FONT_SIZE,
-    PATIENT_NAME,
     PDF_TITLE,
     PDF_AUTHOR,
-    OUTPUT_FILE,
     DPI,
 )
 
@@ -42,10 +40,15 @@ POINTS_PER_INCH = 72.0
 
 class PdfReport:
     """
-    Create the blood test report PDF.
+    Create the PDF report.
     """
 
-    def __init__(self, output_file=OUTPUT_FILE):
+    def __init__(
+        self,
+        output_file: Path,
+        report_title: str,
+    ):
+        self.report_title = report_title
 
         output_file.parent.mkdir(
             parents=True,
@@ -62,9 +65,9 @@ class PdfReport:
 
         self.page_number = 0
 
-    # ------------------------------------------------------------------
+    # ==============================================================
     # Geometry
-    # ------------------------------------------------------------------
+    # ==============================================================
 
     @property
     def plot_width(self) -> float:
@@ -79,26 +82,22 @@ class PdfReport:
             - HEADER_HEIGHT
         )
 
+    #
+    # The chart will be rotated 90° after rendering,
+    # therefore width and height are intentionally swapped.
+    #
+
     @property
     def figure_width(self) -> float:
-        """
-        Width BEFORE rotation.
-
-        Because the chart will be rotated by 90°,
-        width and height are intentionally swapped.
-        """
         return self.plot_height / POINTS_PER_INCH
 
     @property
     def figure_height(self) -> float:
-        """
-        Height BEFORE rotation.
-        """
         return self.plot_width / POINTS_PER_INCH
 
-    # ------------------------------------------------------------------
+    # ==============================================================
     # Header
-    # ------------------------------------------------------------------
+    # ==============================================================
 
     def _draw_header(self):
 
@@ -115,7 +114,7 @@ class PdfReport:
         self.canvas.drawString(
             LEFT_MARGIN,
             top,
-            PATIENT_NAME,
+            self.report_title,
         )
 
         #
@@ -134,7 +133,7 @@ class PdfReport:
 
         self.canvas.setLineWidth(1)
 
-        self.canvas.setStrokeGray(0.55)
+        self.canvas.setStrokeGray(0.60)
 
         self.canvas.line(
             LEFT_MARGIN,
@@ -145,13 +144,14 @@ class PdfReport:
 
         self.canvas.setStrokeGray(0)
 
-    # ------------------------------------------------------------------
+    # ==============================================================
     # Plot
-    # ------------------------------------------------------------------
+    # ==============================================================
 
     def _draw_plot(self, parameter):
         """
-        Draw one rotated chart on the current PDF page.
+        Create the chart, rotate it by 90 degrees and
+        place it on the PDF page.
         """
 
         #
@@ -163,13 +163,10 @@ class PdfReport:
             self.figure_height,
         )
 
-        #
-        # Render figure
-        #
         FigureCanvasAgg(fig)
 
         #
-        # Save to PNG buffer
+        # Save figure into memory
         #
         png_buffer = BytesIO()
 
@@ -185,7 +182,8 @@ class PdfReport:
         png_buffer.seek(0)
 
         #
-        # Rotate 90° clockwise
+        # Rotate image so the time axis becomes parallel
+        # with the long side of the PDF page.
         #
         image = Image.open(png_buffer)
 
@@ -204,37 +202,28 @@ class PdfReport:
         rotated_buffer.seek(0)
 
         #
-        # Available drawing area
-        #
-        x = LEFT_MARGIN
-        y = BOTTOM_MARGIN
-
-        #
-        # Draw rotated image
+        # Draw image
         #
         self.canvas.drawImage(
             ImageReader(rotated_buffer),
-            x,
-            y,
+            LEFT_MARGIN,
+            BOTTOM_MARGIN,
             width=self.plot_width,
             height=self.plot_height,
             preserveAspectRatio=False,
             mask="auto",
         )
 
-        #
-        # Cleanup
-        #
         png_buffer.close()
         rotated_buffer.close()
 
-    # ------------------------------------------------------------------
+    # ==============================================================
     # Public API
-    # ------------------------------------------------------------------
+    # ==============================================================
 
     def add_page(self, parameter):
         """
-        Add one report page.
+        Add one parameter to the report.
         """
 
         self.page_number += 1
@@ -245,11 +234,12 @@ class PdfReport:
 
         self.canvas.showPage()
 
-    # ------------------------------------------------------------------
+    # ==============================================================
 
     def save(self):
         """
-        Save the PDF document.
+        Save the PDF file.
         """
 
         self.canvas.save()
+    
