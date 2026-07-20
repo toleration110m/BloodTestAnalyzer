@@ -74,7 +74,7 @@ LIMIT_FILL_COLOR = "#6AFF40"
 #     5  -> last five years
 #     None -> display all available history
 
-PLOT_YEARS = 5
+PLOT_YEARS = 10
 
 # Major grid every year
 
